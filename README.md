@@ -1,4 +1,4 @@
-# Hasty
+# Hasty [![Build Status](https://travis-ci.org/rustysec/hasty-rs.svg?branch=master)](https://travis-ci.org/rustysec/hasty-rs)
 A completely naive HTTP library without async, but with XP support!
 
 ## Description
