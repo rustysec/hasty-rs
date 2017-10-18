@@ -16,8 +16,8 @@ impl ServerCertVerifier for UnsafeCertVerifier {
     fn verify_server_cert(&self,
         _: &RootCertStore,
         _: &[Certificate],
-//        _: &str,
-        _: webpki::DNSNameRef,
+        _: &str,
+//        _: webpki::DNSNameRef,
         _: &[u8]) -> Result<ServerCertVerified, TLSError> {
             Ok(ServerCertVerified::assertion())
     }
@@ -47,7 +47,7 @@ impl HttpsTransport {
 
         let t = HttpsTransport {
             socket: TcpStream::connect(format!("{}:{:?}", host, port)).map_err(|e| e.to_string())?,
-            session: ClientSession::new(&Arc::new(tls), webpki::DNSNameRef::try_from_ascii_str(&host).unwrap()),
+            session: ClientSession::new(&Arc::new(tls), &host)
         };
 
         Ok(Box::new(Transport::Https(t)))
@@ -56,8 +56,14 @@ impl HttpsTransport {
     pub fn make_request(&mut self, data: &mut Vec<u8>) -> Result<usize, IoError> {
         loop {
             if self.session.wants_read() && self.socket_is_ready_to_read() {
-                self.session.read_tls(&mut self.socket).unwrap();
-                self.session.process_new_packets().unwrap();
+                match self.session.read_tls(&mut self.socket) {
+                    Ok(_) => {},
+                    Err(e) => warn!("Error reading TLS stream: {}", e.to_string())
+                }
+                match self.session.process_new_packets() {
+                    Ok(_) => {},
+                    Err(e) => println!("Error processing TLS packets: {}", e.to_string())
+                }
 
                 match self.session.read_to_end(data) {
                     Ok(_) => {
@@ -68,17 +74,23 @@ impl HttpsTransport {
                                     break;
                                 }
                             },
-                            Err(_) => { /* handle this */ } 
+                            Err(_) => { /* handle this */ }
                         }
                     },
-                    Err(_) => { /* handle this */ } 
+                    Err(_) => { /* handle this */ }
                 }
             }
             if self.session.wants_write() {
-                self.session.write_tls(&mut self.socket).unwrap();
+                match self.session.write_tls(&mut self.socket) {
+                    Ok(_) => {},
+                    Err(e) => println!("Error writing to TLS stream: {}", e.to_string())
+                }
             }
         }
-        self.socket.shutdown(Shutdown::Both).unwrap();
+        match self.socket.shutdown(Shutdown::Both) {
+            Ok(_) => {},
+            Err(e) => println!("Error shutting down TCP connection: {}", e.to_string())
+        }
         Ok(data.len())
     }
 

@@ -4,6 +4,7 @@ mod request;
 mod response;
 mod transports;
 
+#[macro_use] extern crate log;
 extern crate url;
 extern crate rustls;
 #[cfg(test)] extern crate serde_json;
@@ -31,7 +32,7 @@ impl Hasty {
     }
 
     /// Returns a Hasty instance with user defined configuration
-    /// 
+    ///
     /// # Example
     ///
     /// ```
@@ -48,7 +49,7 @@ impl Hasty {
     /// Perform an http request and return a response
     ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// extern crate hasty;
     /// extern crate url;
@@ -58,7 +59,7 @@ impl Hasty {
     ///     use serde_json::{Value, Error};
     ///     use url::Url;
     ///     use hasty::{Hasty,Config,Request};
-    ///     let config = Config::new().disable_https_security();    
+    ///     let config = Config::new().disable_https_security();
     ///     let mut request = Request::new();
     ///     request.with_url("https://localhost:3001/basic_get".parse().unwrap());
     ///
@@ -91,7 +92,7 @@ fn http_post_basic() {
     use Request;
     use Config;
 
-    let config = Config::new().disable_https_security();    
+    let config = Config::new().disable_https_security();
     let mut request = Request::new();
     request.with_url("https://localhost:3001/basic_post".parse().unwrap());
     request.with_method(HttpMethods::Post);
@@ -111,11 +112,11 @@ fn http_post_with_body() {
     extern crate mime;
 
     use serde_json::{Value};
-    
+
     use Request;
     use Config;
 
-    let config = Config::new().disable_https_security();    
+    let config = Config::new().disable_https_security();
     let mut request = Request::new();
     request.with_url("https://localhost:3001/basic_post".parse().unwrap());
     request.with_method(HttpMethods::Post);
