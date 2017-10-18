@@ -1,0 +1,15 @@
+language: rust
+addons:
+  apt:
+    packages:
+    - nodejs
+before_install:
+- cd test_server && npm install
+- node ./index.js &
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
