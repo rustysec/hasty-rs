@@ -8,12 +8,11 @@ url = "*"
 serde = "*"
 serde_json = "1.0"
 serde_derive = "*"
-# webpki = { git = "https://github.com/briansmith/webpki" }
 webpki = "*"
 mime = "*"
 log = "*"
 
 [dependencies.rustls]
-# git = "https://github.com/ctz/rustls.git"
+default-features = false
 version = "0.11.0"
 features = ["dangerous_configuration"]
