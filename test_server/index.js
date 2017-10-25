@@ -16,6 +16,11 @@ app.use(bodyParser.raw({
   type: '*/*'
 }))
 
+app.get('/done', function (req, res) {
+  res.send();
+  process.exit(0)
+})
+
 app.get('/basic_get', function (req, res) {
   res.send('success')
 })
