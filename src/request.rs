@@ -2,7 +2,7 @@ extern crate mime;
 
 use std::collections::HashMap;
 
-use url::{Host,Url};
+use url::Url;
 
 use constants::HttpMethods;
 
@@ -49,7 +49,7 @@ impl Request {
     /// ```
     pub fn from_url(url: Url) -> Request {
         Request {
-            host: url.host().unwrap_or(Host::Domain("www.rust-lang.org")).to_string(),
+            host: url.host().unwrap().to_string(),
             path: url.path().to_owned(),
             method: HttpMethods::Get,
             headers: HashMap::new(),
@@ -60,8 +60,24 @@ impl Request {
     }
 
     /// Set the host and path based on provided url
-    pub fn with_url(&mut self, url: Url) {
-        self.host = url.host().unwrap_or(Host::Domain("www.rust-lang.org")).to_string();
+    /// # Example
+    ///
+    /// ```
+    /// extern crate hasty;
+    /// extern crate url;
+    ///
+    /// use hasty::Request;
+    /// use url::Url;
+    ///
+    /// fn main() {
+    ///     let url = url::Url::parse("http://www.rust-lang.org").unwrap();
+    ///     let mut req = Request::new();
+    ///     req.set_url(url.clone());
+    ///     assert_eq!(req.url().unwrap(), url);
+    /// }
+    /// ```
+    pub fn set_url(&mut self, url: Url) {
+        self.host = url.host().unwrap().to_string();
         self.path = url.path().to_owned();
         self.url = Some(url);
     }
@@ -72,17 +88,17 @@ impl Request {
     }
 
     /// Set the HTTP method
-    pub fn with_method(&mut self, method: HttpMethods) {
+    pub fn set_method(&mut self, method: HttpMethods) {
         self.method = method;
     }
 
     /// Set the content type for the reqeust body
-    pub fn with_content_type(&mut self, content_type: mime::Mime) {
+    pub fn set_content_type(&mut self, content_type: mime::Mime) {
         self.body_type = content_type;
     }
 
     /// Set the payload of the request
-    pub fn with_body(&mut self, body: Option<Vec<u8>>) {
+    pub fn set_body(&mut self, body: Option<Vec<u8>>) {
         self.body = body;
     }
 
@@ -93,8 +109,37 @@ impl Request {
     /// use hasty::Request;
     /// let req = Request::new().add_raw_header("Authentication".to_owned(), "MyApiKey".to_owned());
     /// ```
-    pub fn add_raw_header(mut self, name: String, value: String) -> Self {
+    pub fn add_raw_header(&mut self, name: String, value: String) {
         self.headers.insert(name, value);
+    }
+
+    pub fn with_raw_header(mut self, name: String, value: String) -> Self {
+        self.headers.insert(name, value);
+        self
+    }
+
+    pub fn with_url(mut self, url: Url) -> Self {
+        self.host = url.host().unwrap().to_string();
+        self.path = url.path().to_owned();
+        self.url = Some(url);
+        self
+    }
+
+    /// Set the HTTP method
+    pub fn with_method(mut self, method: HttpMethods) -> Self {
+        self.method = method;
+        self
+    }
+
+    /// Set the content type for the reqeust body
+    pub fn with_content_type(mut self, content_type: mime::Mime) -> Self {
+        self.body_type = content_type;
+        self
+    }
+
+    /// Set the payload of the request
+    pub fn with_body(mut self, body: Option<Vec<u8>>) -> Self {
+        self.body = body;
         self
     }
 

@@ -5,8 +5,8 @@ use hasty::{Config, Hasty, Request, HttpMethods};
 fn main() {
     let mut hasty = Hasty::new_with_config(Config::new().disable_https_security());
     let mut request = Request::from_url("https://localhost:3001/basic_post".parse().unwrap());
-    request.with_method(HttpMethods::Post);
-    request.with_body(Some("snerple".to_owned().as_bytes().to_vec()));
+    request.set_method(HttpMethods::Post);
+    request.set_body(Some("snerple".to_owned().as_bytes().to_vec()));
 
     match hasty.request(request) {
         Ok(resp) => {

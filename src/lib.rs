@@ -61,7 +61,7 @@ impl Hasty {
     ///     use hasty::{Hasty,Config,Request};
     ///     let config = Config::new().disable_https_security();
     ///     let mut request = Request::new();
-    ///     request.with_url("https://localhost:3001/basic_get".parse().unwrap());
+    ///     request.set_url("https://localhost:3001/basic_get".parse().unwrap());
     ///
     ///     let mut hasty = Hasty::new_with_config(config);
     ///     let response = hasty.request(request).unwrap();
@@ -79,7 +79,7 @@ impl Hasty {
                 }?;
 
                 let mut req = request.clone();
-                req.with_url(url);
+                req.set_url(url);
                 Response::from_request(&mut transport, req)
             }
             None => Err("No URL provided".to_owned())
@@ -116,7 +116,7 @@ impl Hasty {
         }?;
 
         let mut req = Request::new();
-        req.with_url(url);
+        req.set_url(url);
         Response::from_request(&mut transport, req)
     }
 }
@@ -132,9 +132,9 @@ fn http_post_basic() {
 
     let config = Config::new().disable_https_security();
     let mut request = Request::new();
-    request.with_url("https://localhost:3001/basic_post".parse().unwrap());
-    request.with_method(HttpMethods::Post);
-    let request = request.add_raw_header("my-header".to_owned(), "looking good!".to_owned());
+    request.set_url("https://localhost:3001/basic_post".parse().unwrap());
+    request.set_method(HttpMethods::Post);
+    request.add_raw_header("my-header".to_owned(), "looking good!".to_owned());
 
     let mut hasty = Hasty::new_with_config(config);
     let response = hasty.request(request).unwrap();
@@ -156,10 +156,10 @@ fn http_post_with_body() {
 
     let config = Config::new().disable_https_security();
     let mut request = Request::new();
-    request.with_url("https://localhost:3001/basic_post".parse().unwrap());
-    request.with_method(HttpMethods::Post);
-    request.with_body(Some(vec![1,2,3,4]));
-    request.with_content_type(mime::APPLICATION_OCTET_STREAM);
+    request.set_url("https://localhost:3001/basic_post".parse().unwrap());
+    request.set_method(HttpMethods::Post);
+    request.set_body(Some(vec![1,2,3,4]));
+    request.set_content_type(mime::APPLICATION_OCTET_STREAM);
 
     let mut hasty = Hasty::new_with_config(config);
     let response = hasty.request(request).unwrap();
