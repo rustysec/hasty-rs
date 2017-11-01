@@ -5,7 +5,7 @@ use hasty::{Config, Hasty, Request};
 fn main() {
     let mut hasty = Hasty::new_with_config(Config::new().disable_https_security());
 
-    match hasty.request("https://localhost:3001/basic_get", Request::new()) {
+    match hasty.request(Request::new()) {
         Ok(resp) => {
             println!("Response: {}", String::from_utf8(resp.body()).unwrap());
         },

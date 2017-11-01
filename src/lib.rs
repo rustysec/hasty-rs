@@ -64,12 +64,50 @@ impl Hasty {
     ///     request.with_url("https://localhost:3001/basic_get".parse().unwrap());
     ///
     ///     let mut hasty = Hasty::new_with_config(config);
-    ///     let response = hasty.request("https://localhost:3001/basic_get", request).unwrap();
+    ///     let response = hasty.request(request).unwrap();
     ///     let body = String::from_utf8(response.body()).unwrap();
     ///     assert_eq!(&body, "success");
     /// }
     /// ```
-    pub fn request(&mut self, url: &str, request: Request) -> Result<Response, String> {
+    pub fn request(&mut self, request: Request) -> Result<Response, String> {
+        match request.url() {
+            Some(url) => {
+                let mut transport = match url.scheme() {
+                    "https" => HttpsTransport::new(url.host(), url.port_or_known_default(), &self.config),
+                    "http" => HttpTransport::new(url.host(), url.port_or_known_default(), &self.config),
+                    _ => Err("Unsupported protocol!".to_owned()),
+                }?;
+
+                let mut req = request.clone();
+                req.with_url(url);
+                Response::from_request(&mut transport, req)
+            }
+            None => Err("No URL provided".to_owned())
+        }
+    }
+
+    /// Perform an http get and return a response
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// extern crate hasty;
+    /// extern crate url;
+    /// extern crate serde_json;
+    ///
+    /// fn main() {
+    ///     use serde_json::{Value, Error};
+    ///     use url::Url;
+    ///     use hasty::{Hasty,Config,Request};
+    ///     let config = Config::new().disable_https_security();
+    ///
+    ///     let mut hasty = Hasty::new_with_config(config);
+    ///     let response = hasty.get("https://localhost:3001/basic_get").unwrap();
+    ///     let body = String::from_utf8(response.body()).unwrap();
+    ///     assert_eq!(&body, "success");
+    /// }
+    /// ```
+    pub fn get(&mut self, url: &str) -> Result<Response, String> {
         let url: Url = url.parse().map_err(|_| "Unable to parse url".to_owned() )?;
         let mut transport = match url.scheme() {
             "https" => HttpsTransport::new(url.host(), url.port_or_known_default(), &self.config),
@@ -77,7 +115,7 @@ impl Hasty {
             _ => Err("Unsupported protocol!".to_owned()),
         }?;
 
-        let mut req = request.clone();
+        let mut req = Request::new();
         req.with_url(url);
         Response::from_request(&mut transport, req)
     }
@@ -99,7 +137,7 @@ fn http_post_basic() {
     let request = request.add_raw_header("my-header".to_owned(), "looking good!".to_owned());
 
     let mut hasty = Hasty::new_with_config(config);
-    let response = hasty.request("https://localhost:3001/basic_post", request).unwrap();
+    let response = hasty.request(request).unwrap();
     let body = String::from_utf8(response.body()).unwrap();
     let json: Value = serde_json::from_str(&body).unwrap();
     assert_eq!(json["headers"]["my-header"], "looking good!");
@@ -124,7 +162,7 @@ fn http_post_with_body() {
     request.with_content_type(mime::APPLICATION_OCTET_STREAM);
 
     let mut hasty = Hasty::new_with_config(config);
-    let response = hasty.request("https://localhost:3001/basic_post", request).unwrap();
+    let response = hasty.request(request).unwrap();
     let body = String::from_utf8(response.body()).unwrap();
     let json: Value = serde_json::from_str(&body).unwrap();
     assert_eq!(json["bodyLength"].as_f64(), Some(4.0));

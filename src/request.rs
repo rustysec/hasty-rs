@@ -14,6 +14,7 @@ pub struct Request {
     headers: HashMap<String,String>,
     body: Option<Vec<u8>>,
     body_type: mime::Mime,
+    url: Option<Url>,
 }
 
 impl Request {
@@ -26,6 +27,7 @@ impl Request {
             headers: HashMap::new(),
             body: None,
             body_type: mime::TEXT_PLAIN,
+            url: None
         }
     }
 
@@ -53,6 +55,7 @@ impl Request {
             headers: HashMap::new(),
             body: None,
             body_type: mime::TEXT_PLAIN,
+            url: Some(url),
         }
     }
 
@@ -60,6 +63,12 @@ impl Request {
     pub fn with_url(&mut self, url: Url) {
         self.host = url.host().unwrap_or(Host::Domain("www.rust-lang.org")).to_string();
         self.path = url.path().to_owned();
+        self.url = Some(url);
+    }
+
+    /// Get the URL
+    pub fn url(&self) -> Option<Url> {
+        self.url.clone()
     }
 
     /// Set the HTTP method
@@ -89,7 +98,7 @@ impl Request {
         self
     }
 
-    /// Returns the request as a transmittable payload 
+    /// Returns the request as a transmittable payload
     ///
     /// # Example
     ///

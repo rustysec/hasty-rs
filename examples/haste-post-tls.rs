@@ -8,7 +8,7 @@ fn main() {
     request.with_method(HttpMethods::Post);
     request.with_body(Some("snerple".to_owned().as_bytes().to_vec()));
 
-    match hasty.request("https://localhost:3001/basic_post", request) {
+    match hasty.request(request) {
         Ok(resp) => {
             println!("Response: {}", String::from_utf8(resp.body()).unwrap());
         },
