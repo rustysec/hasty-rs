@@ -8,11 +8,11 @@ url = "*"
 serde = "*"
 serde_json = "1.0"
 serde_derive = "*"
-webpki = "*"
+webpki = "0.18.0-alpha4"
 mime = "*"
 log = "*"
 
 [dependencies.rustls]
 default-features = false
-version = "0.11.0"
+version = "0.12.0"
 features = ["dangerous_configuration"]

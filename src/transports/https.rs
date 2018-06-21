@@ -16,8 +16,8 @@ impl ServerCertVerifier for UnsafeCertVerifier {
     fn verify_server_cert(&self,
         _: &RootCertStore,
         _: &[Certificate],
-        _: &str,
-//        _: webpki::DNSNameRef,
+//        _: &str,
+        _: webpki::DNSNameRef,
         _: &[u8]) -> Result<ServerCertVerified, TLSError> {
             Ok(ServerCertVerified::assertion())
     }
@@ -34,7 +34,7 @@ impl HttpsTransport {
             return Err("Invalid host!".to_owned());
         }
         let host = host.unwrap().to_string();
-
+        
         let port = match port {
             Some(p) => p,
             None => 443,
@@ -45,12 +45,16 @@ impl HttpsTransport {
             tls.dangerous().set_certificate_verifier(Arc::new(UnsafeCertVerifier {}));
         }
 
-        let t = HttpsTransport {
-            socket: TcpStream::connect(format!("{}:{:?}", host, port)).map_err(|e| e.to_string())?,
-            session: ClientSession::new(&Arc::new(tls), &host)
-        };
-
-        Ok(Box::new(Transport::Https(t)))
+        match webpki::DNSNameRef::try_from_ascii_str(&host) {
+            Ok(host_dnsname) => {
+                let t = HttpsTransport {
+                    socket: TcpStream::connect(format!("{}:{:?}", host, port)).map_err(|e| e.to_string())?,
+                    session: ClientSession::new(&Arc::new(tls), host_dnsname)
+                };
+                Ok(Box::new(Transport::Https(t)))
+            }
+            Err(_) => Err(format!("Invalid hostname: {}", host))
+        }
     }
 
     pub fn make_request(&mut self, data: &mut Vec<u8>) -> Result<usize, IoError> {
