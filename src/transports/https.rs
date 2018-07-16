@@ -16,8 +16,8 @@ impl ServerCertVerifier for UnsafeCertVerifier {
     fn verify_server_cert(&self,
         _: &RootCertStore,
         _: &[Certificate],
-//        _: &str,
-        _: webpki::DNSNameRef,
+        _: &str,
+//        _: webpki::DNSNameRef,
         _: &[u8]) -> Result<ServerCertVerified, TLSError> {
             Ok(ServerCertVerified::assertion())
     }
@@ -45,6 +45,7 @@ impl HttpsTransport {
             tls.dangerous().set_certificate_verifier(Arc::new(UnsafeCertVerifier {}));
         }
 
+        /* TODO: support requests by IP
         match webpki::DNSNameRef::try_from_ascii_str(&host) {
             Ok(host_dnsname) => {
                 let t = HttpsTransport {
@@ -53,8 +54,15 @@ impl HttpsTransport {
                 };
                 Ok(Box::new(Transport::Https(t)))
             }
-            Err(_) => Err(format!("Invalid hostname: {}", host))
+            Err(()) => Err(format!("Invalid hostname: {}", host))
         }
+        */
+
+        let t = HttpsTransport {
+            socket: TcpStream::connect(format!("{}:{:?}", host, port)).map_err(|e| e.to_string())?,
+            session: ClientSession::new(&Arc::new(tls), &host)
+        };
+        Ok(Box::new(Transport::Https(t)))
     }
 
     pub fn make_request(&mut self, data: &mut Vec<u8>) -> Result<usize, IoError> {

@@ -167,3 +167,28 @@ fn http_post_with_body() {
     let json: Value = serde_json::from_str(&body).unwrap();
     assert_eq!(json["bodyLength"].as_f64(), Some(4.0));
 }
+
+#[test]
+fn http_post_by_ip_with_body() {
+    extern crate url;
+    extern crate serde_json;
+    extern crate mime;
+
+    use serde_json::{Value};
+
+    use Request;
+    use Config;
+
+    let config = Config::new().disable_https_security();
+    let mut request = Request::new();
+    request.set_url("https://127.0.0.1:3001/basic_post".parse().unwrap());
+    request.set_method(HttpMethods::Post);
+    request.set_body(Some(vec![1,2,3,4]));
+    request.set_content_type(mime::APPLICATION_OCTET_STREAM);
+
+    let mut hasty = Hasty::new_with_config(config);
+    let response = hasty.request(request).unwrap();
+    let body = String::from_utf8(response.body()).unwrap();
+    let json: Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(json["bodyLength"].as_f64(), Some(4.0));
+}

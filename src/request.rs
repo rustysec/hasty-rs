@@ -49,7 +49,7 @@ impl Request {
     /// ```
     pub fn from_url(url: Url) -> Request {
         Request {
-            host: url.host().unwrap().to_string(),
+            host: url.host_str().unwrap().to_string(),
             path: url.path().to_owned(),
             method: HttpMethods::Get,
             headers: HashMap::new(),
@@ -77,7 +77,7 @@ impl Request {
     /// }
     /// ```
     pub fn set_url(&mut self, url: Url) {
-        self.host = url.host().unwrap().to_string();
+        self.host = url.host_str().unwrap().to_string();
         self.path = url.path().to_owned();
         self.url = Some(url);
     }
