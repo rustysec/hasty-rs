@@ -13,7 +13,7 @@ impl fmt::Display for HttpMethods {
     }
 }
 
-#[derive(Clone,Debug,PartialEq)]
+#[derive(Clone,Debug,PartialEq,Eq)]
 pub enum ResponseCode {
     // Testing
     Undefined = 0,
