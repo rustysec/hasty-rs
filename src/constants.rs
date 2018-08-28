@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub enum HttpMethods {
     Get,
     Post,
@@ -13,7 +13,7 @@ impl fmt::Display for HttpMethods {
     }
 }
 
-#[derive(Clone,Debug,PartialEq,Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResponseCode {
     // Testing
     Undefined = 0,
@@ -80,7 +80,7 @@ pub enum ResponseCode {
     HttpVersionNotSupported = 505,
     VariantAlsoNegotiates = 506,
     InsufficientStorage = 507,
-    LoopDetected = 508 ,
+    LoopDetected = 508,
     NotExtended = 510,
     NetworkAuthenticationRequired = 511,
 }
@@ -166,7 +166,12 @@ impl ResponseCode {
             _ => ResponseCode::Undefined,
         }
     }
-    
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TransferEncoding {
+    Normal,
+    Chunked,
 }
 
 #[test]
