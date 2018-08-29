@@ -34,6 +34,10 @@ app.post('/basic_post', function (req, res) {
   res.send(payload)
 });
 
+app.post('/basic_409', function(req, res) {
+    res.status(409).send()
+});
+
 app.listen(3000, function () {
   console.log('hasty-rs test server listening on 3000!')
 })
