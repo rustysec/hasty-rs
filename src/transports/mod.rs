@@ -53,7 +53,7 @@ pub fn find_sub_vector(large: &Vec<u8>, small: &Vec<u8>) -> Option<usize> {
         return None;
     } else {
         let mut i = 0;
-        while i < (large.len() - small.len()) {
+        while i < (large.len() - small.len()) + 1 {
             let tmp: Vec<u8> = large
                 .iter()
                 .skip(i)

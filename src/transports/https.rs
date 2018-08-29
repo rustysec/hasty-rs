@@ -90,7 +90,11 @@ impl HttpsTransport {
 
                 let mut tmp_data = Vec::new();
                 match self.session.read_to_end(&mut tmp_data) {
-                    Ok(_) => {
+                    Ok(recv_bytes) => {
+                        if recv_bytes == 0 {
+                            continue;
+                        }
+
                         if chunked_encoding {
                             if tmp_data.ends_with("0\r\n\r\n".as_bytes()) {
                                 data.append(&mut tmp_data);
@@ -113,14 +117,22 @@ impl HttpsTransport {
                                             break;
                                         }
                                     }
-                                    Err(e) => warn!("Can't parse headers {}", e.to_string()),
+                                    Err(e) => {
+                                        data.append(&mut tmp_data);
+                                        trace!("Can't parse headers {}", e.to_string());
+                                        break;
+                                    }
                                 }
+                            } else {
+                                trace!("Cannot find headers in response!");
+                                break;
                             }
                         }
                     }
                     Err(e) => {
                         /* handle this */
                         warn!("Error: {}", e.to_string());
+                        break;
                     }
                 }
             }
