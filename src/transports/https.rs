@@ -69,7 +69,8 @@ impl HttpsTransport {
         */
 
         let t = HttpsTransport {
-            socket: TcpStream::connect(format!("{}:{:?}", host, port)).map_err(|e| e.to_string())?,
+            socket: TcpStream::connect(format!("{}:{:?}", host, port))
+                .map_err(|e| e.to_string())?,
             session: ClientSession::new(&Arc::new(tls), &host),
         };
         Ok(Box::new(Transport::Https(t)))
@@ -139,7 +140,10 @@ impl HttpsTransport {
             if self.session.wants_write() {
                 match self.session.write_tls(&mut self.socket) {
                     Ok(_) => {}
-                    Err(e) => warn!("Error writing to TLS stream: {}", e.to_string()),
+                    Err(e) => {
+                        warn!("Error writing to TLS stream: {}", e.to_string());
+                        break;
+                    }
                 }
             }
         }

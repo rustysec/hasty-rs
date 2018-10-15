@@ -1,7 +1,7 @@
 [package]
 name = "hasty"
-version = "0.0.3"
-authors = ["russ <rmorris@infocyte.com>"]
+version = "0.0.4"
+authors = ["russ <russ@infocyte.com>"]
 
 [dependencies]
 url = "1.6.0"
